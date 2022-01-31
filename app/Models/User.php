@@ -49,4 +49,9 @@ class User extends Authenticatable
     {
         static::creating(fn (User $user) => $user->uuid = Str::uuid());
     }
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class, 'sender_id');
+    }
 }
