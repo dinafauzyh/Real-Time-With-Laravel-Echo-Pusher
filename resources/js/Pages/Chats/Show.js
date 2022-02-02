@@ -1,6 +1,7 @@
 import App from '@/Layouts/App';
 import React from 'react'
 import { Head, useForm, usePage } from '@inertiajs/inertia-react'
+import { Inertia } from '@inertiajs/inertia';
 
 const sts = (x, y, option = 'justify') => {
     if(option == 'justify'){
@@ -23,7 +24,11 @@ export default function Show(props) {
                 reset('message');
             }
         });
-    }
+    };
+
+    Echo.channel('chats').listen('MessageSent', ({chat}) => {
+        Inertia.reload({ preserveScroll: true })
+    })
 
     return (
         <div>
