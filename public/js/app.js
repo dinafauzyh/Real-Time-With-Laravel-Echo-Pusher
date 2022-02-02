@@ -4634,8 +4634,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
+var sts = function sts(x, y) {
+  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'justify';
+
+  if (option == 'justify') {
+    return x === y ? 'justify-end' : 'justify-start';
+  }
+
+  if (option == 'background') {
+    return x === y ? 'bg-green-100 text-green-900' : 'bg-gray-100 text-gray-900';
+  }
+};
+
 function Show(props) {
-  var user = props.user;
+  var auth = (0,_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.auth;
+  var user = props.user,
+      chats = props.chats;
 
   var _useForm = (0,_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_2__.useForm)({
     message: ''
@@ -4667,17 +4682,26 @@ function Show(props) {
           children: user.name
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-        className: "flex-1 overflow-y-auto px-4 py-2",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        className: "flex-1 overflow-y-auto px-4 py-2 space-y-2",
+        children: chats.length ? chats.map(function (chat) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+            className: "flex text-sm ".concat(sts(auth.user.id, chat.sender_id)),
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+              className: "p-4 rounded-xl ".concat(sts(auth.user.id, chat.sender_id, 'background')),
+              children: chat.message
+            })
+          }, chat.id);
+        }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
           className: "text-gray-500",
           children: "Start chat with someone . . ."
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-        className: "border-t",
+        className: "border-t px-4 py-2",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("form", {
           onSubmit: submitHandler,
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", {
             value: data.message,
+            autoComplete: "off",
             onChange: function onChange(event) {
               return setData(_objectSpread(_objectSpread({}, data), {}, {
                 message: event.target.value
@@ -4687,7 +4711,7 @@ function Show(props) {
             placeholder: "Start typing . . .",
             name: "message",
             id: "message",
-            className: "form-text focus:outline-none focus:border-0 border-0 focus:ring-0 w-full"
+            className: "form-text focus:outline-none focus:border-0 border-0 focus:ring-0 w-full p-0"
           })
         })
       })]
