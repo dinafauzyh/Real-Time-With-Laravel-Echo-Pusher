@@ -4651,6 +4651,8 @@ var sts = function sts(x, y) {
 
 function Show(props) {
   var auth = (0,_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.auth;
+  var scrollRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
+  var messageRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
   var user = props.user,
       chats = props.chats;
 
@@ -4668,6 +4670,7 @@ function Show(props) {
     post(route('chats.store', user.username), {
       onSuccess: function onSuccess() {
         reset('message');
+        scrollRef.current.scrollTo(0, 9999999);
       }
     });
   };
@@ -4675,9 +4678,16 @@ function Show(props) {
   Echo.channel('chats').listen('MessageSent', function (_ref) {
     var chat = _ref.chat;
     _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_3__.Inertia.reload({
-      preserveScroll: true
+      preserveScroll: true,
+      onSuccess: function onSuccess() {
+        scrollRef.current.scrollTo(0, 9999999);
+      }
     });
   });
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function () {
+    scrollRef.current.scrollTo(0, 9999999);
+    messageRef.current.focus();
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_2__.Head, {
       title: "Chat with ".concat(user.name)
@@ -4691,6 +4701,7 @@ function Show(props) {
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
         className: "flex-1 overflow-y-auto px-4 py-2 space-y-2",
+        ref: scrollRef,
         children: chats.length ? chats.map(function (chat) {
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
             className: "flex text-sm ".concat(sts(auth.user.id, chat.sender_id)),
@@ -4708,6 +4719,7 @@ function Show(props) {
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("form", {
           onSubmit: submitHandler,
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("input", {
+            ref: messageRef,
             value: data.message,
             autoComplete: "off",
             onChange: function onChange(event) {
