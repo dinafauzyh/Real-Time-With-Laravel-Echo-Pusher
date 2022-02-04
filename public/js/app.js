@@ -4675,7 +4675,7 @@ function Show(props) {
     });
   };
 
-  Echo.channel('chats').listen('MessageSent', function (_ref) {
+  Echo["private"]('chats.' + auth.user.id).listen('MessageSent', function (_ref) {
     var chat = _ref.chat;
     _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_3__.Inertia.reload({
       preserveScroll: true,
