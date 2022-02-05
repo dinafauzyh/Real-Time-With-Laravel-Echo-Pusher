@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('chats.{id}', function ($user, $id) {
+Broadcast::channel('chats.{uuid}', function ($user, $uuid) {
     return Auth::check();
 });

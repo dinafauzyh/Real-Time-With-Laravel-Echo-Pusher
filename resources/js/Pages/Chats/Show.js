@@ -29,7 +29,7 @@ export default function Show(props) {
         });
     };
 
-    Echo.private('chats.' + auth.user.id).listen('MessageSent', ({chat}) => {
+    Echo.private('chats.' + auth.user.uuid).listen('MessageSent', ({chat}) => {
         Inertia.reload({ 
             preserveScroll: true,
             onSuccess: () => {
