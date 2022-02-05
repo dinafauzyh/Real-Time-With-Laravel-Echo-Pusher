@@ -4630,6 +4630,18 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 
 
@@ -4651,6 +4663,12 @@ var sts = function sts(x, y) {
 
 function Show(props) {
   var auth = (0,_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.auth;
+
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      typing = _useState2[0],
+      setTyping = _useState2[1];
+
   var scrollRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
   var messageRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
   var user = props.user,
@@ -4675,12 +4693,26 @@ function Show(props) {
     });
   };
 
-  Echo["private"]('chats.' + auth.user.uuid).listen('MessageSent', function (_ref) {
+  var onTyping = function onTyping() {
+    setTimeout(function () {
+      Echo["private"]("chats.".concat(user.uuid)).whisper('isTyping', {
+        name: user.name
+      });
+    }, 500);
+  };
+
+  Echo["private"]('chats.' + auth.user.uuid).listenForWhisper('isTyping', function (e) {
+    setTyping(true);
+    setTimeout(function () {
+      return setTyping(false);
+    }, 5000);
+  }).listen('MessageSent', function (_ref) {
     var chat = _ref.chat;
     _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_3__.Inertia.reload({
       preserveScroll: true,
       onSuccess: function onSuccess() {
         scrollRef.current.scrollTo(0, 9999999);
+        setTyping(false);
       }
     });
   });
@@ -4693,12 +4725,15 @@ function Show(props) {
       title: "Chat with ".concat(user.name)
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
       className: "flex flex-col justify-between h-screen",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
         className: "border-b p-4",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h1", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h1", {
           className: "font-semibold",
           children: user.name
-        })
+        }), typing && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+          className: "text-xs text-gray-500",
+          children: "is typing . . ."
+        })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
         className: "flex-1 overflow-y-auto px-4 py-2 space-y-2",
         ref: scrollRef,
@@ -4719,6 +4754,7 @@ function Show(props) {
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("form", {
           onSubmit: submitHandler,
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("input", {
+            onKeyUp: onTyping,
             ref: messageRef,
             value: data.message,
             autoComplete: "off",
@@ -5143,10 +5179,7 @@ var appName = ((_window$document$getE = window.document.getElementsByTagName('ti
         props = _ref.props;
     return (0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(App, _objectSpread({}, props)), el);
   }
-});
-_inertiajs_progress__WEBPACK_IMPORTED_MODULE_3__.InertiaProgress.init({
-  color: '#4B5563'
-});
+}); // InertiaProgress.init({ color: '#4B5563' });
 
 /***/ }),
 

@@ -1,5 +1,5 @@
 import App from '@/Layouts/App';
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { Head, useForm, usePage } from '@inertiajs/inertia-react'
 import { Inertia } from '@inertiajs/inertia';
 
@@ -15,6 +15,7 @@ const sts = (x, y, option = 'justify') => {
 
 export default function Show(props) {
     const { auth } = usePage().props;
+    const [typing, setTyping] = useState(false)
     const scrollRef = useRef(null);
     const messageRef = useRef(null);
     const { user, chats } = props
@@ -29,13 +30,28 @@ export default function Show(props) {
         });
     };
 
-    Echo.private('chats.' + auth.user.uuid).listen('MessageSent', ({chat}) => {
-        Inertia.reload({ 
-            preserveScroll: true,
-            onSuccess: () => {
-                scrollRef.current.scrollTo(0, 9999999)
-            }
+    const onTyping = () => {
+        setTimeout(() => {
+            Echo.private(`chats.${user.uuid}`)
+                .whisper('isTyping', {name: user.name})
+        }, 500)
+    }
+
+    Echo.private('chats.' + auth.user.uuid)
+        .listenForWhisper('isTyping', (e) => {
+            setTyping(true)
+
+            setTimeout(() => setTyping(false), 5000)
         })
+        
+        .listen('MessageSent', ({chat}) => {
+            Inertia.reload({ 
+                preserveScroll: true,
+                onSuccess: () => {
+                    scrollRef.current.scrollTo(0, 9999999);
+                    setTyping(false)
+                }
+            })
     })
 
     useEffect(() => {
@@ -51,6 +67,9 @@ export default function Show(props) {
 
                 <div className="border-b p-4">
                     <h1 className="font-semibold">{user.name}</h1>
+                    { typing &&
+                        <div className="text-xs text-gray-500">is typing . . .</div>
+                    }
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2" ref={scrollRef}>
@@ -71,7 +90,7 @@ export default function Show(props) {
 
                 <div className="border-t px-4 py-2">
                     <form onSubmit={submitHandler}>
-                        <input ref={messageRef} value={data.message} autoComplete={"off"} onChange={ (event) => setData({...data, message: event.target.value}) } type="text" placeholder="Start typing . . ." name="message" id="message" className="form-text focus:outline-none focus:border-0 border-0 focus:ring-0 w-full p-0" />
+                        <input onKeyUp={onTyping} ref={messageRef} value={data.message} autoComplete={"off"} onChange={ (event) => setData({...data, message: event.target.value}) } type="text" placeholder="Start typing . . ." name="message" id="message" className="form-text focus:outline-none focus:border-0 border-0 focus:ring-0 w-full p-0" />
                     </form>
                 </div>
                 
